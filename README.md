@@ -1,4 +1,7 @@
-# kick-api
+<div>
+	<img src="/assets/kick.jpg" width="50" alt="kick-api" /> <h1>kick-api</h1>
+</div>
+</br>
 
 [![npm package][npm-img]][npm-url]
 [![Downloads][downloads-img]][downloads-url]
@@ -6,9 +9,7 @@
 [![Commitizen Friendly][commitizen-img]][commitizen-url]
 [![Semantic Release][semantic-release-img]][semantic-release-url]
 
-> Effortlessly query kick.com API using an easy-to-use interface with properly typed responses
-
-A zero-dependency TypeScript library for interacting with the [Kick.com API](https://docs.kick.com/apis). Features automatic OAuth 2.1 token management and a clean, intuitive interface.
+> A zero-dependency TypeScript library for interacting with the [Kick.com API](https://docs.kick.com/apis). Features automatic OAuth 2.1 token management and a clean, intuitive interface.
 
 ## Features
 
@@ -25,6 +26,8 @@ npm install @nekiro/kick-api
 ```
 
 ## Quick Start
+
+You'll need kick developer app to use the API. **Read more at** https://docs.kick.com/getting-started/kick-apps-setup.
 
 ```typescript
 import { client } from "@nekiro/kick-api";
@@ -71,10 +74,10 @@ try {
 npm test
 ```
 
-[downloads-img]: https://img.shields.io/npm/dt/kick-api
-[downloads-url]: https://www.npmtrends.com/kick-api
-[npm-img]: https://img.shields.io/npm/v/kick-api
-[npm-url]: https://www.npmjs.com/package/kick-api
+[downloads-img]: https://img.shields.io/npm/dt/@nekiro/kick-api
+[downloads-url]: https://www.npmtrends.com/@nekiro/kick-api
+[npm-img]: https://img.shields.io/npm/v/@nekiro/kick-api
+[npm-url]: https://www.npmjs.com/package/@nekiro/kick-api
 [issues-img]: https://img.shields.io/github/issues/nekiro/kick-api
 [issues-url]: https://github.com/nekiro/kick-api/issues
 [semantic-release-img]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg

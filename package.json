@@ -11,7 +11,7 @@
 		"clean": "rm -rf ./lib/",
 		"cm": "cz",
 		"lint": "eslint ./src/ --fix",
-		"prepare": "husky install",
+		"prepare": "husky",
 		"semantic-release": "semantic-release",
 		"test:watch": "jest --watch",
 		"test": "jest --coverage",
