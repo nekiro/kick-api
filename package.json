@@ -1,0 +1,123 @@
+{
+	"name": "@nekiro/kick-api",
+	"version": "1.0.0",
+	"description": "Efortlessly query kick.com api using easy to use interface with properly typed responses.",
+	"main": "./lib/index.js",
+	"files": [
+		"lib/**/*"
+	],
+	"scripts": {
+		"build": "tsc --project tsconfig.build.json",
+		"clean": "rm -rf ./lib/",
+		"cm": "cz",
+		"lint": "eslint ./src/ --fix",
+		"prepare": "husky install",
+		"semantic-release": "semantic-release",
+		"test:watch": "jest --watch",
+		"test": "jest --coverage",
+		"typecheck": "tsc --noEmit"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/nekiro/kick-api.git"
+	},
+	"license": "MIT",
+	"author": {
+		"name": "Marcin Jalocha",
+		"email": "nekiro.dev@gmail.com",
+		"url": "https://github.com/nekiro"
+	},
+	"engines": {
+		"node": ">=20.0"
+	},
+	"keywords": [
+		"kick",
+		"kick.com",
+		"api",
+		"client",
+		"streaming",
+		"typescript"
+	],
+	"bugs": {
+		"url": "https://github.com/nekiro/kick-api/issues"
+	},
+	"homepage": "https://github.com/nekiro/kick-api#readme",
+	"publishConfig": {
+		"access": "public"
+	},
+	"devDependencies": {
+		"@ryansonshine/commitizen": "^4.2.8",
+		"@ryansonshine/cz-conventional-changelog": "^3.3.4",
+		"@types/jest": "^30.0.0",
+		"@types/node": "^24.1.0",
+		"@typescript-eslint/eslint-plugin": "^8.38.0",
+		"@typescript-eslint/parser": "^8.38.0",
+		"conventional-changelog-conventionalcommits": "^9.1.0",
+		"dotenv": "^17.2.1",
+		"eslint": "^9.32.0",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-node": "^11.1.0",
+		"eslint-plugin-prettier": "^5.5.3",
+		"husky": "^9.1.7",
+		"jest": "^30.0.5",
+		"lint-staged": "^16.1.2",
+		"prettier": "^3.6.2",
+		"semantic-release": "^24.2.7",
+		"ts-jest": "^29.4.0",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.8.3"
+	},
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/@ryansonshine/cz-conventional-changelog"
+		}
+	},
+	"lint-staged": {
+		"*.ts": "eslint --cache --cache-location .eslintcache --fix"
+	},
+	"release": {
+		"branches": [
+			"master"
+		],
+		"plugins": [
+			[
+				"@semantic-release/commit-analyzer",
+				{
+					"preset": "conventionalcommits",
+					"releaseRules": [
+						{
+							"type": "build",
+							"scope": "deps",
+							"release": "patch"
+						}
+					]
+				}
+			],
+			[
+				"@semantic-release/release-notes-generator",
+				{
+					"preset": "conventionalcommits",
+					"presetConfig": {
+						"types": [
+							{
+								"type": "feat",
+								"section": "Features"
+							},
+							{
+								"type": "fix",
+								"section": "Bug Fixes"
+							},
+							{
+								"type": "build",
+								"section": "Dependencies and Other Build Updates",
+								"hidden": false
+							}
+						]
+					}
+				}
+			],
+			"@semantic-release/npm",
+			"@semantic-release/github"
+		]
+	}
+}
