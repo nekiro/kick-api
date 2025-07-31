@@ -241,11 +241,13 @@ export class KickClient {
 				throw createKickError(response.status, response.statusText, responseBody, headers, endpoint);
 			}
 
-			return response.json();
+			const json = await response.json();
+			return json.data;
 		} catch (error) {
 			if (error instanceof Error && error.constructor.name.startsWith("Kick")) {
 				throw error;
 			}
+
 			throw new KickNetworkError(`Request to ${endpoint} failed`, error as Error);
 		}
 	}

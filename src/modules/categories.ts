@@ -1,4 +1,4 @@
-import type { ApiResponse, Category, PaginatedResponse, RequestFn } from "../types";
+import type { Category, RequestFn } from "../types";
 import { KickBadRequestError } from "../errors";
 
 export class CategoriesModule {
@@ -6,7 +6,7 @@ export class CategoriesModule {
 
 	constructor(private request: RequestFn) {}
 
-	async getCategories(params: { q: string; page?: number }): Promise<PaginatedResponse<Category>> {
+	async getCategories(params: { q: string; page?: number }): Promise<Category[]> {
 		if (!params || !params.q) {
 			throw new KickBadRequestError("q is required");
 		}
@@ -19,11 +19,10 @@ export class CategoriesModule {
 			searchParams.append("page", params.page.toString());
 		}
 
-		const endpoint = `${this.baseRoute}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
-		return this.request<PaginatedResponse<Category>>(endpoint);
+		return this.request<Category[]>(`${this.baseRoute}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`);
 	}
 
-	async getCategory(categoryId: number): Promise<ApiResponse<Category>> {
-		return this.request<ApiResponse<Category>>(`${this.baseRoute}/${categoryId}`);
+	async getCategory(categoryId: number): Promise<Category> {
+		return this.request<Category>(`${this.baseRoute}/${categoryId}`);
 	}
 }

@@ -29,20 +29,10 @@ export interface OAuthToken {
 	expiresAt: number;
 }
 
-export interface ApiResponse<T> {
-	data: T;
-	message: string;
-}
-
 export interface Category {
 	id: number;
 	name: string;
 	thumbnail: string;
-}
-
-export interface PaginatedResponse<T> {
-	data: T[];
-	message: string;
 }
 
 export interface User {

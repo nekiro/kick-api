@@ -1,4 +1,4 @@
-import type { Livestream, PaginatedResponse, RequestFn } from "../types";
+import type { Livestream, RequestFn } from "../types";
 
 export class LivestreamsModule {
 	private readonly baseRoute = "/public/v1/livestreams";
@@ -10,7 +10,7 @@ export class LivestreamsModule {
 		subcategory?: string;
 		sort?: "viewer_count" | "created_at";
 		page?: number;
-	}): Promise<PaginatedResponse<Livestream>> {
+	}): Promise<Livestream[]> {
 		const searchParams = new URLSearchParams();
 
 		if (params?.category) {
@@ -29,8 +29,6 @@ export class LivestreamsModule {
 			searchParams.append("page", params.page.toString());
 		}
 
-		return this.request<PaginatedResponse<Livestream>>(
-			`${this.baseRoute}${searchParams.size ? `?${searchParams.toString()}` : ""}`,
-		);
+		return this.request<Livestream[]>(`${this.baseRoute}${searchParams.size ? `?${searchParams.toString()}` : ""}`);
 	}
 }

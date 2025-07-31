@@ -1,4 +1,4 @@
-import type { Channel, PaginatedResponse, RequestFn } from "../types";
+import type { Channel, RequestFn } from "../types";
 
 export class ChannelsModule {
 	private readonly baseRoute = "/public/v1/channels";
@@ -10,7 +10,7 @@ export class ChannelsModule {
 		subcategory?: string;
 		sort?: "viewer_count" | "created_at";
 		page?: number;
-	}): Promise<PaginatedResponse<Channel>> {
+	}): Promise<Channel[]> {
 		const searchParams = new URLSearchParams();
 
 		if (params?.category) {
@@ -29,8 +29,6 @@ export class ChannelsModule {
 			searchParams.append("page", params.page.toString());
 		}
 
-		return this.request<PaginatedResponse<Channel>>(
-			`${this.baseRoute}${searchParams.size ? `?${searchParams.toString()}` : ""}`,
-		);
+		return this.request<Channel[]>(`${this.baseRoute}${searchParams.size ? `?${searchParams.toString()}` : ""}`);
 	}
 }
