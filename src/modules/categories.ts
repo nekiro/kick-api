@@ -1,10 +1,9 @@
-import type { KickClient } from "../client";
-import type { ApiResponse, Category, PaginatedResponse } from "../types";
+import type { ApiResponse, Category, PaginatedResponse, RequestFn } from "../types";
 
 export class CategoriesModule {
 	private readonly baseRoute = "/public/v1/categories";
 
-	constructor(private client: KickClient) {}
+	constructor(private request: RequestFn) {}
 
 	async getCategories(params?: { q: string; page?: number }): Promise<PaginatedResponse<Category>> {
 		const searchParams = new URLSearchParams();
@@ -18,10 +17,10 @@ export class CategoriesModule {
 		}
 
 		const endpoint = `${this.baseRoute}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
-		return this.client.request<PaginatedResponse<Category>>(endpoint);
+		return this.request<PaginatedResponse<Category>>(endpoint);
 	}
 
 	async getCategory(categoryId: number): Promise<ApiResponse<Category>> {
-		return this.client.request<ApiResponse<Category>>(`${this.baseRoute}/${categoryId}`);
+		return this.request<ApiResponse<Category>>(`${this.baseRoute}/${categoryId}`);
 	}
 }

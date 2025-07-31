@@ -1,10 +1,9 @@
-import type { KickClient } from "../client";
-import type { Channel, PaginatedResponse } from "../types";
+import type { Channel, PaginatedResponse, RequestFn } from "../types";
 
 export class ChannelsModule {
 	private readonly baseRoute = "/public/v1/channels";
 
-	constructor(private client: KickClient) {}
+	constructor(private request: RequestFn) {}
 
 	async getChannels(params?: {
 		category?: string;
@@ -30,7 +29,7 @@ export class ChannelsModule {
 			searchParams.append("page", params.page.toString());
 		}
 
-		return this.client.request<PaginatedResponse<Channel>>(
+		return this.request<PaginatedResponse<Channel>>(
 			`${this.baseRoute}${searchParams.size ? `?${searchParams.toString()}` : ""}`,
 		);
 	}

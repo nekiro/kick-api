@@ -1,10 +1,9 @@
-import type { KickClient } from "../client";
-import type { Livestream, PaginatedResponse } from "../types";
+import type { Livestream, PaginatedResponse, RequestFn } from "../types";
 
 export class LivestreamsModule {
 	private readonly baseRoute = "/public/v1/livestreams";
 
-	constructor(private client: KickClient) {}
+	constructor(private request: RequestFn) {}
 
 	async getLivestreams(params?: {
 		category?: string;
@@ -30,7 +29,7 @@ export class LivestreamsModule {
 			searchParams.append("page", params.page.toString());
 		}
 
-		return this.client.request<PaginatedResponse<Livestream>>(
+		return this.request<PaginatedResponse<Livestream>>(
 			`${this.baseRoute}${searchParams.size ? `?${searchParams.toString()}` : ""}`,
 		);
 	}
