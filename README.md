@@ -40,6 +40,90 @@ const kickClient = new client({
 const channel = await kickClient.channels.getChannel("xqc");
 ```
 
+## Examples
+
+The `examples/` directory contains comprehensive, runnable examples for all authentication methods and API usage patterns:
+
+### 🚀 **Quick Start Examples**
+
+```bash
+# Basic API usage with all modules
+npx ts-node examples/basic-usage.ts
+
+# Bot authentication (automatic)
+npx ts-node examples/bot-authentication.ts
+
+# Interactive user authentication
+npx ts-node examples/user-authentication.ts
+```
+
+### 📚 **Available Examples**
+
+| Example                          | Description                  | Use Case                  |
+| -------------------------------- | ---------------------------- | ------------------------- |
+| **basic-usage.ts**               | Complete API showcase        | Learning all endpoints    |
+| **bot-authentication.ts**        | Client credentials flow      | Automated bots, servers   |
+| **user-authentication.ts**       | Interactive OAuth 2.1 + PKCE | User-facing applications  |
+| **interactive-user-auth.ts**     | Enhanced OAuth experience    | Step-by-step user auth    |
+| **authentication-comparison.ts** | Bot vs User auth guide       | Choosing the right method |
+| **oauth-troubleshooting.ts**     | Fix redirect URI errors      | Debugging OAuth issues    |
+| **debug-token-exchange.ts**      | Token exchange debugging     | Fixing auth failures      |
+
+### 🎯 **Authentication Methods**
+
+**Bot Authentication** (Server-to-Server):
+
+```typescript
+// Automatic token management
+const botClient = new client({
+	clientId: "your-client-id",
+	clientSecret: "your-client-secret",
+	// No redirectUri = bot mode
+});
+
+await botClient.chat.postMessage({
+	type: "bot",
+	content: "Hello from bot!",
+});
+```
+
+**User Authentication** (OAuth 2.1):
+
+```typescript
+// User permission-based
+const userClient = new client({
+	clientId: "your-client-id",
+	clientSecret: "your-client-secret",
+	redirectUri: "http://localhost:3000/callback",
+});
+
+// Generate OAuth URL
+const pkceParams = userClient.generatePKCEParams();
+const authUrl = userClient.getAuthorizationUrl(pkceParams, ["public", "chat:write"]);
+
+// Exchange code for token
+const token = await userClient.exchangeCodeForToken({
+	code: authorizationCode,
+	codeVerifier: pkceParams.codeVerifier,
+});
+```
+
+### 🛠️ **Troubleshooting Tools**
+
+Got OAuth errors? Use our built-in debugging tools:
+
+```bash
+# Fix "invalid redirect uri" errors
+npx ts-node examples/oauth-troubleshooting.ts
+
+# Debug token exchange failures
+npx ts-node examples/debug-token-exchange.ts
+```
+
+### 📖 **Learn More**
+
+See the complete examples documentation: [`examples/README.md`](examples/README.md)
+
 ## Error Handling
 
 The library provides specific error classes for different types of failures:
