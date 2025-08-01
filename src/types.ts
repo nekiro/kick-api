@@ -1,5 +1,3 @@
-export type RequestFn = <T>(endpoint: string, options?: RequestInit) => Promise<T>;
-
 export interface KickClientConfig {
 	clientId: string;
 	clientSecret: string;
@@ -76,22 +74,26 @@ export interface Channel {
 }
 
 export interface Livestream {
-	id: number;
-	slug: string;
-	channel_id: number;
-	created_at: string;
-	session_title: string;
-	is_live: boolean;
-	risk_level_id: number;
-	start_time: string;
-	source?: any;
-	twitch_channel?: any;
-	duration: number;
-	language: string;
-	is_mature: boolean;
-	viewer_count: number;
-	thumbnail?: string;
-	viewers: number;
+	broadcaster_user_id: number;
 	category: Category;
-	tags: string[];
+	channel_id: number;
+	has_mature_content: boolean;
+	language: string;
+	slug: string;
+	started_at: string;
+	stream_title: string;
+	thumbnail: string;
+	viewer_count: number;
+}
+
+export interface ChatMessageRequest {
+	broadcaster_user_id?: number;
+	content: string;
+	reply_to_message_id?: string;
+	type: "user" | "bot";
+}
+
+export interface ChatMessageResponse {
+	is_sent: boolean;
+	message_id: string;
 }

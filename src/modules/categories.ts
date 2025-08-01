@@ -1,10 +1,11 @@
-import type { Category, RequestFn } from "../types";
+import type { Category } from "../types";
 import { KickBadRequestError } from "../errors";
+import { KickClient } from "../client";
 
 export class CategoriesModule {
 	private readonly baseRoute = "/public/v1/categories";
 
-	constructor(private request: RequestFn) {}
+	constructor(private client: KickClient) {}
 
 	async getCategories(params: { q: string; page?: number }): Promise<Category[]> {
 		if (!params || !params.q) {
@@ -19,10 +20,12 @@ export class CategoriesModule {
 			searchParams.append("page", params.page.toString());
 		}
 
-		return this.request<Category[]>(`${this.baseRoute}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`);
+		return this.client.request<Category[]>(
+			`${this.baseRoute}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`,
+		);
 	}
 
 	async getCategory(categoryId: number): Promise<Category> {
-		return this.request<Category>(`${this.baseRoute}/${categoryId}`);
+		return this.client.request<Category>(`${this.baseRoute}/${categoryId}`);
 	}
 }

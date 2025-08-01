@@ -1,9 +1,10 @@
-import type { Channel, RequestFn } from "../types";
+import type { Channel } from "../types";
+import { KickClient } from "../client";
 
 export class ChannelsModule {
 	private readonly baseRoute = "/public/v1/channels";
 
-	constructor(private request: RequestFn) {}
+	constructor(private client: KickClient) {}
 
 	async getChannels(params?: {
 		category?: string;
@@ -29,6 +30,6 @@ export class ChannelsModule {
 			searchParams.append("page", params.page.toString());
 		}
 
-		return this.request<Channel[]>(`${this.baseRoute}${searchParams.size ? `?${searchParams.toString()}` : ""}`);
+		return this.client.request<Channel[]>(`${this.baseRoute}${searchParams.size ? `?${searchParams.toString()}` : ""}`);
 	}
 }

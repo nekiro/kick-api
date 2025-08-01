@@ -1,9 +1,10 @@
-import type { Livestream, RequestFn } from "../types";
+import type { Livestream } from "../types";
+import { KickClient } from "../client";
 
 export class LivestreamsModule {
 	private readonly baseRoute = "/public/v1/livestreams";
 
-	constructor(private request: RequestFn) {}
+	constructor(private client: KickClient) {}
 
 	async getLivestreams(params?: {
 		category?: string;
@@ -29,6 +30,8 @@ export class LivestreamsModule {
 			searchParams.append("page", params.page.toString());
 		}
 
-		return this.request<Livestream[]>(`${this.baseRoute}${searchParams.size ? `?${searchParams.toString()}` : ""}`);
+		return this.client.request<Livestream[]>(
+			`${this.baseRoute}${searchParams.size ? `?${searchParams.toString()}` : ""}`,
+		);
 	}
 }
