@@ -52,11 +52,9 @@ async function main() {
 
 		console.log("\n📺 Testing Channels API...");
 
-		// Get channels
+		// Get channels by slug
 		const channels = await kickClient.channels.getChannels({
-			category: "Gaming",
-			sort: "viewer_count",
-			page: 1,
+			slug: ["xqc", "ninja"], // Example channel slugs
 		});
 
 		console.log(`Found ${channels.length} channels:`);
@@ -68,9 +66,9 @@ async function main() {
 
 		// Get live streams
 		const livestreams = await kickClient.livestreams.getLivestreams({
-			category: "Gaming",
+			category_id: 1, // Gaming category
 			sort: "viewer_count",
-			page: 1,
+			limit: 20,
 		});
 
 		console.log(`Found ${livestreams.length} live streams:`);

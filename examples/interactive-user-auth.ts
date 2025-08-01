@@ -172,19 +172,15 @@ async function interactiveUserAuthentication() {
 		console.log(`✅ Retrieved ${categories.length} categories`);
 
 		// Test channels
-		console.log("\n📺 Fetching gaming channels...");
-		const channels = await userClient.channels.getChannels({
-			category: "Gaming",
-			sort: "viewer_count",
-			page: 1,
-		});
+		console.log("\n📺 Fetching user's channel...");
+		const channels = await userClient.channels.getChannels();
 		console.log(`✅ Retrieved ${channels.length} channels`);
 
 		// Test livestreams
 		console.log("\n🎥 Fetching live streams...");
 		const livestreams = await userClient.livestreams.getLivestreams({
-			category: "Gaming",
-			page: 1,
+			category_id: 1, // Gaming category
+			limit: 10,
 		});
 		console.log(`✅ Retrieved ${livestreams.length} live streams`);
 

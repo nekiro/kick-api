@@ -7,6 +7,39 @@ export class ChatModule {
 
 	constructor(private client: KickClient) {}
 
+	/**
+	 * Send a chat message as either a bot or user
+	 *
+	 * @param params - Message parameters with conditional requirements:
+	 *   - For bot messages: only content and type are required
+	 *   - For user messages: broadcaster_user_id is also required
+	 *
+	 * @example Bot message
+	 * ```typescript
+	 * await client.chat.postMessage({
+	 *   type: "bot",
+	 *   content: "Hello from bot!"
+	 * });
+	 * ```
+	 *
+	 * @example User message
+	 * ```typescript
+	 * await client.chat.postMessage({
+	 *   type: "user",
+	 *   broadcaster_user_id: 12345,
+	 *   content: "Hello from user!"
+	 * });
+	 * ```
+	 *
+	 * @example Reply message
+	 * ```typescript
+	 * await client.chat.postMessage({
+	 *   type: "bot",
+	 *   content: "This is a reply!",
+	 *   reply_to_message_id: "original_message_id"
+	 * });
+	 * ```
+	 */
 	async postMessage(params: ChatMessageRequest): Promise<ChatMessageResponse> {
 		if (!params || !params.content) {
 			throw new KickBadRequestError("content is required");

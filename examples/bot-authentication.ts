@@ -62,8 +62,8 @@ async function botAuthenticationExample() {
 
 		// Subsequent calls will reuse the cached token
 		const livestreams = await botClient.livestreams.getLivestreams({
-			category: "Gaming",
-			page: 1,
+			category_id: 1, // Gaming category
+			limit: 10,
 		});
 
 		console.log(`✅ Found ${livestreams.length} live streams (using cached token)`);

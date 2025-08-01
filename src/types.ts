@@ -86,11 +86,18 @@ export interface Livestream {
 	viewer_count: number;
 }
 
-export interface ChatMessageRequest {
-	broadcaster_user_id?: number;
+export type ChatMessageRequest = ChatBotMessageRequest | ChatUserMessageRequest;
+
+export interface ChatBotMessageRequest {
+	type: "bot";
 	content: string;
 	reply_to_message_id?: string;
-	type: "user" | "bot";
+}
+export interface ChatUserMessageRequest {
+	type: "user";
+	broadcaster_user_id: number;
+	content: string;
+	reply_to_message_id?: string;
 }
 
 export interface ChatMessageResponse {
