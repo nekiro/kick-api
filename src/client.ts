@@ -1,16 +1,18 @@
-import { KickClientConfig, OAuthAuthorizationParams, OAuthToken, OAuthTokenRequest } from "./types";
-import { CategoriesModule } from "./modules/categories";
-import { ChannelsModule } from "./modules/channels";
-import { LivestreamsModule } from "./modules/livestreams";
-import { ChatModule } from "./modules/chat";
-import { KickOAuthError, createKickError, KickNetworkError } from "./errors";
-import { randomBytes, createHash } from "crypto";
+import { KickClientConfig, OAuthAuthorizationParams, OAuthToken, OAuthTokenRequest } from "./types.ts";
+import { CategoriesModule } from "./modules/categories.ts";
+import { UsersModule } from "./modules/users.ts";
+import { ChannelsModule } from "./modules/channels.ts";
+import { LivestreamsModule } from "./modules/livestreams.ts";
+import { ChatModule } from "./modules/chat.ts";
+import { KickOAuthError, createKickError, KickNetworkError } from "./errors.ts";
+import { randomBytes, createHash } from "node:crypto";
 
 export class KickClient {
 	private config: KickClientConfig;
 	private token: OAuthToken | null = null;
 	private tokenPromise: Promise<string> | null = null;
 
+	public readonly users: UsersModule;
 	public readonly categories: CategoriesModule;
 	public readonly channels: ChannelsModule;
 	public readonly livestreams: LivestreamsModule;
@@ -24,6 +26,7 @@ export class KickClient {
 		};
 
 		this.categories = new CategoriesModule(this);
+		this.users = new UsersModule(this);
 		this.channels = new ChannelsModule(this);
 		this.livestreams = new LivestreamsModule(this);
 		this.chat = new ChatModule(this);

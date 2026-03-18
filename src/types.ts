@@ -38,6 +38,8 @@ export interface User {
 	username: string;
 	slug: string;
 	bio?: string;
+	profile_picture: string | null;
+	email?: string;
 	country?: string;
 	state?: string;
 	city?: string;

@@ -1,6 +1,6 @@
-import type { ChatMessageRequest, ChatMessageResponse } from "../types";
-import { KickBadRequestError } from "../errors";
-import { KickClient } from "../client";
+import type { ChatMessageRequest, ChatMessageResponse } from "../types.ts";
+import { KickBadRequestError } from "../errors.ts";
+import { KickClient } from "../client.ts";
 
 export class ChatModule {
 	private readonly baseRoute = "/public/v1/chat";

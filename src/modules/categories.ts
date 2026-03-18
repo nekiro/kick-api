@@ -1,6 +1,6 @@
-import type { Category } from "../types";
-import { KickBadRequestError } from "../errors";
-import { KickClient } from "../client";
+import type { Category } from "../types.ts";
+import { KickBadRequestError } from "../errors.ts";
+import type { KickClient } from "../client.ts";
 
 export class CategoriesModule {
 	private readonly baseRoute = "/public/v1/categories";

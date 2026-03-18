@@ -1,6 +1,6 @@
-import type { Channel } from "../types";
-import { KickClient } from "../client";
-import { KickBadRequestError } from "../errors";
+import type { Channel } from "../types.ts";
+import { KickClient } from "../client.ts";
+import { KickBadRequestError } from "../errors.ts";
 
 export class ChannelsModule {
 	private readonly baseRoute = "/public/v1/channels";

@@ -1,6 +1,6 @@
-import type { Livestream } from "../types";
-import { KickClient } from "../client";
-import { KickBadRequestError } from "../errors";
+import type { Livestream } from "../types.ts";
+import { KickClient } from "../client.ts";
+import { KickBadRequestError } from "../errors.ts";
 
 export class LivestreamsModule {
 	private readonly baseRoute = "/public/v1/livestreams";

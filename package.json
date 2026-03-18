@@ -120,5 +120,8 @@
 			"@semantic-release/npm",
 			"@semantic-release/github"
 		]
+	},
+	"dependencies": {
+		"vite": "^8.0.0"
 	}
 }
