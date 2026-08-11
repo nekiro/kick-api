@@ -10,7 +10,7 @@ export interface KickClientConfig {
 export interface OAuthAuthorizationParams {
 	codeVerifier: string;
 	codeChallenge: string;
-	state?: string;
+	state: string;
 }
 
 export interface OAuthTokenRequest {
@@ -102,11 +102,13 @@ export interface ChannelStream {
 	custom_tags: string[];
 	is_live: boolean;
 	is_mature: boolean;
-	key: string;
+	/** Present only when the token grants streamkey:read. */
+	key?: string;
 	language: string;
 	start_time: string;
 	thumbnail: string;
-	url: string;
+	/** Present only when the token grants streamkey:read. */
+	url?: string;
 	viewer_count: number;
 }
 
@@ -114,10 +116,10 @@ export interface Channel {
 	broadcaster_user_id: number;
 	slug: string;
 	stream_title: string;
-	channel_description: string;
-	banner_picture: string;
-	category: Category;
-	stream: ChannelStream;
+	channel_description: string | null;
+	banner_picture: string | null;
+	category: Category | null;
+	stream: ChannelStream | null;
 	active_subscribers_count?: number;
 	active_gifted_subscribers_count?: number;
 	canceled_subscribers_count?: number;
@@ -251,7 +253,7 @@ export interface FailedRedemption {
 
 export interface EventSubscriptionRequest {
 	broadcaster_user_id?: number;
-	events: Array<{ name: KickEventName; version: 1 | number }>;
+	events: Array<{ name: KickEventName; version: 1 }>;
 	method?: "webhook";
 }
 
@@ -278,9 +280,9 @@ export interface EventSubscription {
 	id: string;
 	app_id: string;
 	broadcaster_user_id: number;
-	event: string;
+	event: KickEventName;
 	version: number;
-	method: string;
+	method: "webhook";
 	created_at: string;
 	updated_at: string;
 }

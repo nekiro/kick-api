@@ -7,6 +7,6 @@ export const client = KickClient as new (config: import("./types").KickClientCon
 export * from "./types";
 export * from "./webhook-types";
 export * from "./errors";
-export { verifyWebhookSignature } from "./modules/events";
+export { isWebhookTimestampFresh, verifyWebhookSignature } from "./modules/events";
 export type { VerifyWebhookSignatureParams } from "./modules/events";
 export type { GetRedemptionsParams } from "./modules/channel-rewards";

@@ -18,6 +18,13 @@ export function verifyWebhookSignature(params: VerifyWebhookSignatureParams): bo
 	return verify("RSA-SHA256", Buffer.from(signedPayload), params.publicKey, Buffer.from(params.signature, "base64"));
 }
 
+/** Check the webhook timestamp against a replay-protection window. Persist messageId separately for idempotency. */
+export function isWebhookTimestampFresh(timestamp: string, maxAgeSeconds = 300, now = Date.now()): boolean {
+	if (maxAgeSeconds < 0) return false;
+	const sentAt = Date.parse(timestamp);
+	return Number.isFinite(sentAt) && Math.abs(now - sentAt) <= maxAgeSeconds * 1000;
+}
+
 export class EventsModule {
 	private readonly baseRoute = "/public/v1/events/subscriptions";
 
@@ -29,7 +36,7 @@ export class EventsModule {
 	}
 
 	async subscribe(params: EventSubscriptionRequest): Promise<EventSubscriptionResult[]> {
-		if (!params.events.length) throw new KickBadRequestError("events cannot be empty");
+		if (!params?.events.length) throw new KickBadRequestError("events cannot be empty");
 		return this.client.request<EventSubscriptionResult[]>(this.baseRoute, {
 			method: "POST",
 			body: JSON.stringify(params),
@@ -37,7 +44,7 @@ export class EventsModule {
 	}
 
 	async unsubscribe(ids: string[]): Promise<void> {
-		if (!ids.length) throw new KickBadRequestError("ids cannot be empty");
+		if (!ids.length || ids.some((id) => !id)) throw new KickBadRequestError("ids cannot be empty");
 		const searchParams = new URLSearchParams();
 		ids.forEach((id) => searchParams.append("id", id));
 		await this.client.request<void>(`${this.baseRoute}?${searchParams.toString()}`, { method: "DELETE" });

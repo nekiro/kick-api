@@ -27,7 +27,7 @@ Scope names now use the values documented by Kick. Replace obsolete values such 
 
 Kick deprecated the v1 category and livestream listing endpoints. Migrate to:
 
-- `categories.getCategoriesV2()` and `categories.getCategoryV2()`
+- `categories.getCategoriesV2()`; use `getCategoriesV2({ id: [categoryId] })` to select a category by ID
 - `livestreams.getLivestreamsV2()` for cursor-paginated discovery
 - `livestreams.getLivestreamsByUserIds()` for specific broadcasters
 

@@ -27,10 +27,16 @@ export class ChannelRewardsModule {
 	}
 
 	async createReward(params: CreateChannelRewardRequest): Promise<ChannelReward> {
+		this.validateReward(params, true);
 		return this.client.request<ChannelReward>(this.baseRoute, { method: "POST", body: JSON.stringify(params) });
 	}
 
 	async updateReward(id: string, params: UpdateChannelRewardRequest): Promise<ChannelReward> {
+		this.validateId(id, "reward ID");
+		if (!params || Object.keys(params).length === 0) {
+			throw new KickBadRequestError("At least one reward property is required");
+		}
+		this.validateReward(params, false);
 		return this.client.request<ChannelReward>(`${this.baseRoute}/${encodeURIComponent(id)}`, {
 			method: "PATCH",
 			body: JSON.stringify(params),
@@ -38,6 +44,7 @@ export class ChannelRewardsModule {
 	}
 
 	async deleteReward(id: string): Promise<void> {
+		this.validateId(id, "reward ID");
 		await this.client.request<void>(`${this.baseRoute}/${encodeURIComponent(id)}`, { method: "DELETE" });
 	}
 
@@ -73,8 +80,30 @@ export class ChannelRewardsModule {
 	}
 
 	private validateRedemptionIds(ids: string[]): void {
-		if (!ids.length || ids.length > 25 || new Set(ids).size !== ids.length) {
+		if (!ids.length || ids.length > 25 || ids.some((id) => !id) || new Set(ids).size !== ids.length) {
 			throw new KickBadRequestError("ids must contain between 1 and 25 unique redemption IDs");
+		}
+	}
+
+	private validateId(id: string, name: string): void {
+		if (!id) throw new KickBadRequestError(`${name} is required`);
+	}
+
+	private validateReward(params: UpdateChannelRewardRequest, creating: boolean): void {
+		if (creating && (!params.title || params.cost === undefined)) {
+			throw new KickBadRequestError("title and cost are required");
+		}
+		if (params.title !== undefined && (!params.title || params.title.length > 50)) {
+			throw new KickBadRequestError("title must contain between 1 and 50 characters");
+		}
+		if (params.cost !== undefined && (!Number.isInteger(params.cost) || params.cost < 1)) {
+			throw new KickBadRequestError("cost must be a positive integer");
+		}
+		if (params.description !== undefined && params.description.length > 200) {
+			throw new KickBadRequestError("description must be 200 characters or less");
+		}
+		if (params.background_color !== undefined && !/^#[0-9a-fA-F]{6}$/.test(params.background_color)) {
+			throw new KickBadRequestError("background_color must be a six-digit hex color");
 		}
 	}
 }

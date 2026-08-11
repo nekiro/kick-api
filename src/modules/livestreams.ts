@@ -86,6 +86,12 @@ export class LivestreamsModule {
 		if (params?.limit && (params.limit < 1 || params.limit > 100)) {
 			throw new KickBadRequestError("limit must be between 1 and 100");
 		}
+		if (params?.broadcaster_user_id && params.broadcaster_user_id.length > 50) {
+			throw new KickBadRequestError("broadcaster_user_id cannot contain more than 50 IDs");
+		}
+		if (params?.broadcaster_user_id?.some((id) => !Number.isInteger(id) || id < 1)) {
+			throw new KickBadRequestError("broadcaster_user_id must contain positive integers");
+		}
 
 		// Add broadcaster_user_id parameters
 		if (params?.broadcaster_user_id) {
@@ -127,6 +133,9 @@ export class LivestreamsModule {
 		if (params.category_id && params.category_id.length > 25) {
 			throw new KickBadRequestError("category_id cannot contain more than 25 IDs");
 		}
+		if (params.category_id?.some((id) => !Number.isInteger(id) || id < 1)) {
+			throw new KickBadRequestError("category_id must contain positive integers");
+		}
 		if (params.language_code && params.language_code.length > 25) {
 			throw new KickBadRequestError("language_code cannot contain more than 25 values");
 		}
@@ -145,6 +154,9 @@ export class LivestreamsModule {
 	async getLivestreamsByUserIds(userIds: number[]): Promise<LivestreamV2[]> {
 		if (!userIds.length || userIds.length > 100) {
 			throw new KickBadRequestError("userIds must contain between 1 and 100 IDs");
+		}
+		if (userIds.some((id) => !Number.isInteger(id) || id < 1)) {
+			throw new KickBadRequestError("userIds must contain positive integers");
 		}
 		const searchParams = new URLSearchParams();
 		userIds.forEach((id) => searchParams.append("user_id", id.toString()));

@@ -1,5 +1,5 @@
 import { generateKeyPairSync, sign } from "crypto";
-import { verifyWebhookSignature } from "../src";
+import { isWebhookTimestampFresh, verifyWebhookSignature } from "../src";
 
 describe("verifyWebhookSignature", () => {
 	it("accepts a valid signature and rejects a modified body", () => {
@@ -14,5 +14,12 @@ describe("verifyWebhookSignature", () => {
 
 		expect(verifyWebhookSignature(params)).toBe(true);
 		expect(verifyWebhookSignature({ ...params, body: `${body} ` })).toBe(false);
+	});
+
+	it("checks webhook timestamps against a replay window", () => {
+		const now = Date.parse("2026-08-11T12:00:00Z");
+		expect(isWebhookTimestampFresh("2026-08-11T11:56:00Z", 300, now)).toBe(true);
+		expect(isWebhookTimestampFresh("2026-08-11T11:54:00Z", 300, now)).toBe(false);
+		expect(isWebhookTimestampFresh("invalid", 300, now)).toBe(false);
 	});
 });

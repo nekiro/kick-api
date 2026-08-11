@@ -53,7 +53,10 @@ export class ChatModule {
 			throw new KickBadRequestError("content must be 500 characters or less");
 		}
 
-		if (params.type === "user" && !params.broadcaster_user_id) {
+		if (
+			params.type === "user" &&
+			(!Number.isInteger(params.broadcaster_user_id) || params.broadcaster_user_id < 1)
+		) {
 			throw new KickBadRequestError("broadcaster_user_id is required when type is 'user'");
 		}
 
@@ -64,7 +67,7 @@ export class ChatModule {
 	}
 
 	async deleteMessage(messageId: string): Promise<void> {
-		if (!messageId) throw new KickBadRequestError("messageId is required");
+		if (!messageId.trim()) throw new KickBadRequestError("messageId is required");
 		await this.client.request<void>(`${this.baseRoute}/${encodeURIComponent(messageId)}`, { method: "DELETE" });
 	}
 }

@@ -83,6 +83,9 @@ export class KickClient {
 				"redirectUri is required for user authentication flow. For server-to-server, tokens are handled automatically.",
 			);
 		}
+		if (!params.state) {
+			throw new Error("state is required for the OAuth authorization flow");
+		}
 
 		const url = new URL(`${this.config.oauthUrl}/oauth/authorize`);
 
@@ -93,9 +96,7 @@ export class KickClient {
 		url.searchParams.set("code_challenge", params.codeChallenge);
 		url.searchParams.set("code_challenge_method", "S256");
 
-		if (params.state) {
-			url.searchParams.set("state", params.state);
-		}
+		url.searchParams.set("state", params.state);
 
 		return url.toString();
 	}

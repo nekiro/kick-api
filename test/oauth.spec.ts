@@ -25,6 +25,12 @@ describe("OAuth and transport", () => {
 		);
 		expect(url.searchParams.get("scope")).toBe("user:read channel:read");
 		expect(url.searchParams.get("state")).toBe("state");
+		expect(() =>
+			kickClient.getAuthorizationUrl(
+				{ codeVerifier: "verifier", codeChallenge: "challenge", state: "" },
+				["user:read"],
+			),
+		).toThrow("state is required");
 	});
 
 	it("exchanges a code for a classified user token", async () => {

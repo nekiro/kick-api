@@ -1,4 +1,4 @@
-import { client } from "../src";
+import { client, KickBadRequestError } from "../src";
 
 const makeClient = () => {
 	const kickClient = new client({ clientId: "id", clientSecret: "secret" });
@@ -81,5 +81,27 @@ describe("API modules", () => {
 			"https://api.kick.com/public/v1/kicks/leaderboard?top=10",
 			"https://api.kick.com/public/v1/chat/message-id",
 		]));
+	});
+
+	it("validates documented API limits before making a request", async () => {
+		const fetchMock = jest.spyOn(global, "fetch");
+		const kickClient = makeClient();
+
+		await expect(kickClient.categories.getCategoriesV2({ cursor: "x".repeat(29) })).rejects.toBeInstanceOf(
+			KickBadRequestError,
+		);
+		await expect(kickClient.categories.getCategoriesV2({ id: [0] })).rejects.toBeInstanceOf(KickBadRequestError);
+		await expect(
+			kickClient.livestreams.getLivestreams({ broadcaster_user_id: Array.from({ length: 51 }, (_, i) => i + 1) }),
+		).rejects.toBeInstanceOf(KickBadRequestError);
+		await expect(kickClient.channels.updateChannel({ category_id: 0 })).rejects.toBeInstanceOf(KickBadRequestError);
+		await expect(kickClient.channelRewards.createReward({ title: "", cost: 0 })).rejects.toBeInstanceOf(
+			KickBadRequestError,
+		);
+		await expect(kickClient.channelRewards.updateReward("reward", {})).rejects.toBeInstanceOf(KickBadRequestError);
+		await expect(kickClient.moderation.banUser({ broadcaster_user_id: 0, user_id: 2 })).rejects.toBeInstanceOf(
+			KickBadRequestError,
+		);
+		expect(fetchMock).not.toHaveBeenCalled();
 	});
 });

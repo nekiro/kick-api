@@ -61,6 +61,18 @@ export class CategoriesModule {
 		if (params.limit !== undefined && (params.limit < 1 || params.limit > 1000)) {
 			throw new KickBadRequestError("limit must be between 1 and 1000");
 		}
+		if (params.cursor && params.cursor.length > 28) {
+			throw new KickBadRequestError("cursor must be 28 characters or less");
+		}
+		if (params.id?.some((id) => !Number.isInteger(id) || id < 1)) {
+			throw new KickBadRequestError("category IDs must be positive integers");
+		}
+		if (params.name?.some((name) => !name || name.length > 100)) {
+			throw new KickBadRequestError("category names must contain between 1 and 100 characters");
+		}
+		if (params.tag?.some((tag) => !tag || tag.length > 100)) {
+			throw new KickBadRequestError("category tags must contain between 1 and 100 characters");
+		}
 
 		const searchParams = new URLSearchParams();
 		if (params.cursor) searchParams.set("cursor", params.cursor);
@@ -93,6 +105,9 @@ export class CategoriesModule {
 	 * @deprecated Kick deprecated Categories v1. Use getCategoriesV2 with an id filter.
 	 */
 	async getCategory(categoryId: number): Promise<CategoryDetail> {
+		if (!Number.isInteger(categoryId) || categoryId < 1) {
+			throw new KickBadRequestError("categoryId must be a positive integer");
+		}
 		return this.client.request<CategoryDetail>(`${this.baseRoute}/${categoryId}`);
 	}
 }

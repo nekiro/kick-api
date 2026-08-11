@@ -6,7 +6,7 @@ export class KicksModule {
 	constructor(private client: KickClient) {}
 
 	async getLeaderboard(top?: number): Promise<KicksLeaderboard> {
-		if (top !== undefined && (top < 1 || top > 100)) {
+		if (top !== undefined && (!Number.isInteger(top) || top < 1 || top > 100)) {
 			throw new KickBadRequestError("top must be between 1 and 100");
 		}
 		const query = top !== undefined ? `?top=${top}` : "";

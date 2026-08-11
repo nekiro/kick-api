@@ -42,8 +42,9 @@ const channel = await kickClient.channels.getChannel("xqc");
 console.log(channel.broadcaster_user_id, channel.stream_title);
 ```
 
-An unknown slug rejects with `KickNotFoundError`. The public channel response does not contain a profile picture;
-use `users.getUser(channel.broadcaster_user_id)` or `livestreams.getLivestreamsByUserIds()` when an avatar is needed.
+An unknown slug rejects with `KickNotFoundError`. The public channel response does not contain a profile picture.
+Do not substitute `banner_picture` for an avatar or wait for the channel to go live: fetch the user by
+`broadcaster_user_id` with `users.getUser()`, which also works while the channel is offline.
 
 ## Current API
 
@@ -65,6 +66,9 @@ await kickClient.events.subscribe({
 	events: [{ name: "chat.message.sent", version: 1 }],
 });
 ```
+
+For webhook replay protection, verify the signature, require a fresh timestamp with
+`isWebhookTimestampFresh()`, and persist `Kick-Event-Message-Id` values as idempotency keys.
 
 `getCategories()`, `getCategory()` and `getLivestreams()` target deprecated Kick v1 endpoints and remain available
 for compatibility. New integrations should use their v2 counterparts.

@@ -60,14 +60,17 @@ export class ChannelsModule {
 		if (params?.broadcaster_user_id && params.broadcaster_user_id.length > 50) {
 			throw new KickBadRequestError("Cannot provide more than 50 broadcaster user IDs");
 		}
+		if (params?.broadcaster_user_id?.some((id) => !Number.isInteger(id) || id < 1)) {
+			throw new KickBadRequestError("Broadcaster user IDs must be positive integers");
+		}
 
 		if (params?.slug && params.slug.length > 50) {
 			throw new KickBadRequestError("Cannot provide more than 50 slugs");
 		}
 
 		// Validate slug length
-		if (params?.slug && params.slug.some((slug) => slug.length > 25)) {
-			throw new KickBadRequestError("Each slug must be 25 characters or less");
+		if (params?.slug && params.slug.some((slug) => !slug || slug.length > 25)) {
+			throw new KickBadRequestError("Each slug must contain between 1 and 25 characters");
 		}
 
 		// Add broadcaster_user_id parameters
@@ -127,6 +130,9 @@ export class ChannelsModule {
 		}
 		if (params.custom_tags && params.custom_tags.length > 10) {
 			throw new KickBadRequestError("custom_tags cannot contain more than 10 items");
+		}
+		if (params.category_id !== undefined && (!Number.isInteger(params.category_id) || params.category_id < 1)) {
+			throw new KickBadRequestError("category_id must be a positive integer");
 		}
 		if (params.stream_title !== undefined && params.stream_title.length === 0) {
 			throw new KickBadRequestError("stream_title cannot be empty");
