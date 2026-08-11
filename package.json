@@ -1,22 +1,31 @@
 {
 	"name": "@nekiro/kick-api",
-	"version": "2.1.2",
-	"description": "Efortlessly query kick.com api using easy to use interface with properly typed responses.",
+	"version": "3.0.0",
+	"description": "Effortlessly query the Kick public API with a typed TypeScript client.",
 	"main": "./lib/index.js",
+	"types": "./lib/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./lib/index.d.ts",
+			"require": "./lib/index.js",
+			"default": "./lib/index.js"
+		}
+	},
 	"files": [
-		"lib/**/*"
+		"lib/**/*",
+		"MIGRATION.md"
 	],
 	"scripts": {
 		"build": "tsc --project tsconfig.build.json",
 		"clean": "rm -rf ./lib/",
 		"cm": "cz",
-		"lint": "eslint ./src/ --fix",
+		"lint": "eslint ./src/ ./test/",
+		"lint:fix": "eslint ./src/ ./test/ --fix",
 		"prepare": "husky",
-		"semantic-release": "semantic-release",
+		"prepublishOnly": "npm run typecheck && npm test -- --runInBand && npm run build",
 		"test:watch": "jest --watch",
 		"test": "jest --coverage",
-		"typecheck": "tsc --noEmit",
-		"publish": "npm run build && npm publish"
+		"typecheck": "tsc --noEmit && tsc --project tsconfig.examples.json"
 	},
 	"repository": {
 		"type": "git",
@@ -63,7 +72,6 @@
 		"jest": "^30.0.5",
 		"lint-staged": "^16.1.2",
 		"prettier": "^3.6.2",
-		"semantic-release": "^24.2.7",
 		"ts-jest": "^29.4.0",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.8.3"
@@ -75,50 +83,5 @@
 	},
 	"lint-staged": {
 		"*.ts": "eslint --cache --cache-location .eslintcache --fix"
-	},
-	"release": {
-		"branches": [
-			"master"
-		],
-		"plugins": [
-			[
-				"@semantic-release/commit-analyzer",
-				{
-					"preset": "conventionalcommits",
-					"releaseRules": [
-						{
-							"type": "build",
-							"scope": "deps",
-							"release": "patch"
-						}
-					]
-				}
-			],
-			[
-				"@semantic-release/release-notes-generator",
-				{
-					"preset": "conventionalcommits",
-					"presetConfig": {
-						"types": [
-							{
-								"type": "feat",
-								"section": "Features"
-							},
-							{
-								"type": "fix",
-								"section": "Bug Fixes"
-							},
-							{
-								"type": "build",
-								"section": "Dependencies and Other Build Updates",
-								"hidden": false
-							}
-						]
-					}
-				}
-			],
-			"@semantic-release/npm",
-			"@semantic-release/github"
-		]
 	}
 }

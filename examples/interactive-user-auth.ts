@@ -13,6 +13,7 @@
  */
 
 import { client } from "../src";
+import type { KickScope } from "../src";
 import dotenv from "dotenv";
 import * as readline from "readline";
 
@@ -102,21 +103,20 @@ async function interactiveUserAuthentication() {
 		// Step 2: Generate authorization URL with custom scopes
 		console.log("2️⃣ What permissions would you like to request?");
 		console.log("Available scopes:");
-		console.log("   • public - Basic public information");
-		console.log("   • chat:read - Read chat messages");
-		console.log("   • chat:write - Send chat messages");
-		console.log("   • channels:read - Read channel information");
 		console.log("   • user:read - Read user profile information");
+		console.log("   • channel:read - Read channel information");
+		console.log("   • chat:write - Send chat messages");
 
-		const useDefaultScopes = await confirmAction("\nUse default scopes (public, chat:read, chat:write)?");
+		const useDefaultScopes = await confirmAction("\nUse default scopes (user:read, channel:read, chat:write)?");
 
-		let scopes = ["public", "chat:read", "chat:write"];
+		const availableScopes: KickScope[] = ["user:read", "channel:read", "chat:write"];
+		let scopes: KickScope[] = availableScopes;
 		if (!useDefaultScopes) {
 			const customScopes = await getUserInput("Enter comma-separated scopes: ");
 			scopes = customScopes
 				.split(",")
 				.map((s) => s.trim())
-				.filter((s) => s.length > 0);
+				.filter((scope): scope is KickScope => availableScopes.includes(scope as KickScope));
 		}
 
 		console.log(`\n📝 Requesting scopes: ${scopes.join(", ")}`);

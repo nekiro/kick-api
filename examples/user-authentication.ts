@@ -65,7 +65,7 @@ async function userAuthenticationExample() {
 
 		// Step 2: Generate authorization URL
 		console.log("2️⃣ Generating authorization URL...");
-		const authUrl = userClient.getAuthorizationUrl(pkceParams, ["public", "chat:read", "chat:write", "channels:read"]);
+		const authUrl = userClient.getAuthorizationUrl(pkceParams, ["user:read", "channel:read", "chat:write"]);
 		console.log("✅ Authorization URL generated\n");
 
 		// Step 3: User interaction
@@ -195,7 +195,7 @@ async function simulateCompleteUserFlow() {
 		console.log("1. User clicks 'Login with Kick' button");
 
 		const pkceParams = userClient.generatePKCEParams();
-		const authUrl = userClient.getAuthorizationUrl(pkceParams, ["public", "chat:write"]);
+		const authUrl = userClient.getAuthorizationUrl(pkceParams, ["user:read", "chat:write"]);
 
 		console.log("2. User redirected to Kick for authorization");
 		console.log(`   ${authUrl.substring(0, 60)}...`);
@@ -261,7 +261,7 @@ function createWebServerExample() {
 	console.log("  userSessions.set(req.sessionID, pkceParams);");
 	console.log("  ");
 	console.log("  const authUrl = kickClient.getAuthorizationUrl(pkceParams, [");
-	console.log("    'public', 'chat:read', 'chat:write'");
+	console.log("    'user:read', 'channel:read', 'chat:write'");
 	console.log("  ]);");
 	console.log("  ");
 	console.log("  res.redirect(authUrl);");

@@ -45,8 +45,8 @@ async function botAuthenticationExample() {
 
 		console.log("\n2. Making first API call (triggers automatic authentication)...");
 
-		const categories = await botClient.categories.getCategories({ q: "gaming" });
-		console.log(`✅ Successfully authenticated! Found ${categories.length} categories.`);
+		const categories = await botClient.categories.getCategoriesV2({ name: ["gaming"] });
+		console.log(`✅ Successfully authenticated! Found ${categories.data.length} categories.`);
 
 		console.log("\n3. Sending a chat message as bot...");
 
@@ -61,12 +61,12 @@ async function botAuthenticationExample() {
 		console.log("\n4. Making additional API calls (reuses cached token)...");
 
 		// Subsequent calls will reuse the cached token
-		const livestreams = await botClient.livestreams.getLivestreams({
-			category_id: 1, // Gaming category
+		const livestreams = await botClient.livestreams.getLivestreamsV2({
+			category_id: [1], // Gaming category
 			limit: 10,
 		});
 
-		console.log(`✅ Found ${livestreams.length} live streams (using cached token)`);
+		console.log(`✅ Found ${livestreams.data.length} live streams (using cached token)`);
 
 		console.log("\n🎉 Bot authentication example completed successfully!");
 		console.log("\nKey points about bot authentication:");

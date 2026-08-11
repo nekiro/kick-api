@@ -1,10 +1,34 @@
-import { KickClientConfig, OAuthAuthorizationParams, OAuthToken, OAuthTokenRequest } from "./types";
+import {
+	KickClientConfig,
+	KickScope,
+	OAuthAuthorizationParams,
+	OAuthToken,
+	OAuthTokenRequest,
+	OAuthTokenTypeHint,
+	TokenIntrospection,
+	UserOAuthToken,
+} from "./types";
 import { CategoriesModule } from "./modules/categories";
 import { ChannelsModule } from "./modules/channels";
 import { LivestreamsModule } from "./modules/livestreams";
 import { ChatModule } from "./modules/chat";
-import { KickOAuthError, createKickError, KickNetworkError } from "./errors";
+import { UsersModule } from "./modules/users";
+import { ModerationModule } from "./modules/moderation";
+import { EventsModule } from "./modules/events";
+import { ChannelRewardsModule } from "./modules/channel-rewards";
+import { KicksModule } from "./modules/kicks";
+import { PublicKeyModule } from "./modules/public-key";
+import { KickApiError, KickOAuthError, createKickError, KickNetworkError } from "./errors";
 import { randomBytes, createHash } from "crypto";
+
+interface OAuthTokenResponse {
+	access_token: string;
+	token_type: string;
+	expires_in: number;
+	refresh_token?: string;
+	refresh_expires_in?: number;
+	scope?: string;
+}
 
 export class KickClient {
 	private config: KickClientConfig;
@@ -15,6 +39,12 @@ export class KickClient {
 	public readonly channels: ChannelsModule;
 	public readonly livestreams: LivestreamsModule;
 	public readonly chat: ChatModule;
+	public readonly users: UsersModule;
+	public readonly moderation: ModerationModule;
+	public readonly events: EventsModule;
+	public readonly channelRewards: ChannelRewardsModule;
+	public readonly kicks: KicksModule;
+	public readonly publicKey: PublicKeyModule;
 
 	constructor(config: KickClientConfig) {
 		this.config = {
@@ -27,6 +57,12 @@ export class KickClient {
 		this.channels = new ChannelsModule(this);
 		this.livestreams = new LivestreamsModule(this);
 		this.chat = new ChatModule(this);
+		this.users = new UsersModule(this);
+		this.moderation = new ModerationModule(this);
+		this.events = new EventsModule(this);
+		this.channelRewards = new ChannelRewardsModule(this);
+		this.kicks = new KicksModule(this);
+		this.publicKey = new PublicKeyModule(this);
 	}
 
 	generatePKCEParams(): OAuthAuthorizationParams {
@@ -41,7 +77,7 @@ export class KickClient {
 		};
 	}
 
-	getAuthorizationUrl(params: OAuthAuthorizationParams, scopes: string[] = ["public"]): string {
+	getAuthorizationUrl(params: OAuthAuthorizationParams, scopes: readonly KickScope[] = ["user:read"]): string {
 		if (!this.config.redirectUri) {
 			throw new Error(
 				"redirectUri is required for user authentication flow. For server-to-server, tokens are handled automatically.",
@@ -64,7 +100,7 @@ export class KickClient {
 		return url.toString();
 	}
 
-	async exchangeCodeForToken(tokenRequest: OAuthTokenRequest): Promise<OAuthToken> {
+	async exchangeCodeForToken(tokenRequest: OAuthTokenRequest): Promise<UserOAuthToken> {
 		if (!this.config.redirectUri) {
 			throw new Error(
 				"redirectUri is required for authorization code flow. For server-to-server, tokens are handled automatically.",
@@ -92,7 +128,7 @@ export class KickClient {
 			if (this.config.debug) {
 				console.log("🔍 Debug - OAuth Token Request:");
 				console.log("URL:", `${this.config.oauthUrl}/oauth/token`);
-				console.log("Body:", body.toString());
+				console.log("Grant type: authorization_code (credentials redacted)");
 			}
 
 			if (!response.ok) {
@@ -119,15 +155,23 @@ export class KickClient {
 				);
 			}
 
-			const data = await response.json();
+			const data = (await response.json()) as OAuthTokenResponse;
+			if (!data.refresh_token) {
+				throw new KickOAuthError("Token response did not include a refresh token", 500, data);
+			}
 
 			this.token = {
+				kind: "user",
 				accessToken: data.access_token,
 				tokenType: data.token_type,
 				expiresIn: data.expires_in,
 				refreshToken: data.refresh_token,
+				refreshExpiresIn: data.refresh_expires_in,
 				scope: data.scope,
 				expiresAt: Date.now() + data.expires_in * 1000,
+				refreshExpiresAt: data.refresh_expires_in
+					? Date.now() + data.refresh_expires_in * 1000
+					: undefined,
 			};
 
 			return this.token;
@@ -141,6 +185,23 @@ export class KickClient {
 
 	setToken(token: OAuthToken): void {
 		this.token = token;
+	}
+
+	async introspectToken(): Promise<TokenIntrospection> {
+		return this.request<TokenIntrospection>("/oauth/token/introspect", { method: "POST" });
+	}
+
+	async revokeToken(token: string, tokenTypeHint?: OAuthTokenTypeHint): Promise<void> {
+		const searchParams = new URLSearchParams({ token });
+		if (tokenTypeHint) searchParams.set("token_type_hint", tokenTypeHint);
+
+		const response = await fetch(`${this.config.oauthUrl}/oauth/revoke?${searchParams.toString()}`, {
+			method: "POST",
+		});
+
+		if (!response.ok) {
+			throw new KickOAuthError(`Token revocation failed: ${response.status} ${response.statusText}`, response.status);
+		}
 	}
 
 	private async getAccessToken(): Promise<string> {
@@ -201,7 +262,7 @@ export class KickClient {
 			if (this.config.debug) {
 				console.log("🔍 Debug - Client Credentials Request:");
 				console.log("URL:", `${this.config.oauthUrl}/oauth/token`);
-				console.log("Body:", body.toString());
+				console.log("Grant type: client_credentials (credentials redacted)");
 			}
 
 			if (!response.ok) {
@@ -228,13 +289,13 @@ export class KickClient {
 				);
 			}
 
-			const data = await response.json();
+			const data = (await response.json()) as OAuthTokenResponse;
 
 			this.token = {
+				kind: "app",
 				accessToken: data.access_token,
 				tokenType: data.token_type,
 				expiresIn: data.expires_in,
-				refreshToken: data.refresh_token,
 				scope: data.scope,
 				expiresAt: Date.now() + data.expires_in * 1000,
 			};
@@ -298,15 +359,21 @@ export class KickClient {
 				);
 			}
 
-			const data = await response.json();
+			const data = (await response.json()) as OAuthTokenResponse;
+			const refreshToken = data.refresh_token || this.token.refreshToken;
 
 			this.token = {
+				kind: "user",
 				accessToken: data.access_token,
 				tokenType: data.token_type,
 				expiresIn: data.expires_in,
-				refreshToken: data.refresh_token || this.token.refreshToken,
+				refreshToken,
+				refreshExpiresIn: data.refresh_expires_in,
 				scope: data.scope,
 				expiresAt: Date.now() + data.expires_in * 1000,
+				refreshExpiresAt: data.refresh_expires_in
+					? Date.now() + data.refresh_expires_in * 1000
+					: this.token.refreshExpiresAt,
 			};
 
 			return this.token.accessToken;
@@ -319,6 +386,11 @@ export class KickClient {
 	}
 
 	async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+		const response = await this.requestEnvelope<{ data: T }>(endpoint, options);
+		return response?.data as T;
+	}
+
+	async requestEnvelope<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
 		try {
 			const accessToken = await this.getAccessToken();
 			const url = `${this.config.baseUrl}${endpoint}`;
@@ -358,10 +430,16 @@ export class KickClient {
 				throw createKickError(response.status, response.statusText, responseBody, headers, endpoint);
 			}
 
-			const json = await response.json();
-			return json.data;
+			if (response.status === 204 || response.status === 205) {
+				return undefined as T;
+			}
+
+			const body = await response.text();
+			if (!body) return undefined as T;
+
+			return JSON.parse(body) as T;
 		} catch (error) {
-			if (error instanceof Error && error.constructor.name.startsWith("Kick")) {
+			if (error instanceof KickApiError || error instanceof KickNetworkError) {
 				throw error;
 			}
 

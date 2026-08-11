@@ -7,17 +7,18 @@
 [![Downloads][downloads-img]][downloads-url]
 [![Issues][issues-img]][issues-url]
 [![Commitizen Friendly][commitizen-img]][commitizen-url]
-[![Semantic Release][semantic-release-img]][semantic-release-url]
 
 > A zero-dependency TypeScript library for interacting with the [Kick.com API](https://docs.kick.com/apis). Features automatic OAuth 2.1 token management and a clean, intuitive interface.
 
 ## Features
 
 - 🔒 **Automatic OAuth Management** - Handles token refresh automatically
-- 📝 **Full TypeScript Support** - Complete type definitions for all API responses
+- 📝 **Full TypeScript Support** - Types matching the current public Kick API
+- 📄 **Cursor Pagination** - Categories v2 and Livestreams v2
+- 🔔 **Webhooks** - Event subscriptions and RSA signature verification
 - 🚀 **Zero Dependencies** - Uses built-in Node.js fetch
 - 🎯 **Clean API** - Organized modules for different endpoints
-- ⚡ **Modern** - Built with async/await and ES modules
+- ⚡ **Modern** - Built for Node.js 20+ with native fetch and async/await
 
 ## Install
 
@@ -38,7 +39,35 @@ const kickClient = new client({
 });
 
 const channel = await kickClient.channels.getChannel("xqc");
+console.log(channel.broadcaster_user_id, channel.stream_title);
 ```
+
+An unknown slug rejects with `KickNotFoundError`. The public channel response does not contain a profile picture;
+use `users.getUser(channel.broadcaster_user_id)` or `livestreams.getLivestreamsByUserIds()` when an avatar is needed.
+
+## Current API
+
+```typescript
+// Cursor-paginated categories and livestreams
+const categories = await kickClient.categories.getCategoriesV2({ name: ["Just Chatting"] });
+const livestreams = await kickClient.livestreams.getLivestreamsV2({
+	language_code: ["en"],
+	limit: 100,
+});
+
+// User profile picture
+const user = await kickClient.users.getUser(channel.broadcaster_user_id);
+console.log(user?.profile_picture);
+
+// Webhook subscriptions
+await kickClient.events.subscribe({
+	broadcaster_user_id: channel.broadcaster_user_id,
+	events: [{ name: "chat.message.sent", version: 1 }],
+});
+```
+
+`getCategories()`, `getCategory()` and `getLivestreams()` target deprecated Kick v1 endpoints and remain available
+for compatibility. New integrations should use their v2 counterparts.
 
 ## Examples
 
@@ -99,7 +128,7 @@ const userClient = new client({
 
 // Generate OAuth URL
 const pkceParams = userClient.generatePKCEParams();
-const authUrl = userClient.getAuthorizationUrl(pkceParams, ["public", "chat:write"]);
+const authUrl = userClient.getAuthorizationUrl(pkceParams, ["user:read", "chat:write"]);
 
 // Exchange code for token
 const token = await userClient.exchangeCodeForToken({
@@ -164,7 +193,5 @@ npm test
 [npm-url]: https://www.npmjs.com/package/@nekiro/kick-api
 [issues-img]: https://img.shields.io/github/issues/nekiro/kick-api
 [issues-url]: https://github.com/nekiro/kick-api/issues
-[semantic-release-img]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
-[semantic-release-url]: https://github.com/semantic-release/semantic-release
 [commitizen-img]: https://img.shields.io/badge/commitizen-friendly-brightgreen.svg
 [commitizen-url]: http://commitizen.github.io/cz-cli/

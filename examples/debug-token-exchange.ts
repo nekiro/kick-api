@@ -61,7 +61,7 @@ async function debugTokenExchange() {
 
 		// Generate authorization URL
 		console.log("\n2️⃣ Generating authorization URL...");
-		const authUrl = userClient.getAuthorizationUrl(pkceParams, ["public", "chat:read", "chat:write"]);
+		const authUrl = userClient.getAuthorizationUrl(pkceParams, ["user:read", "channel:read", "chat:write"]);
 		console.log("✅ Authorization URL generated");
 
 		// Check if user wants to use existing code or get new one

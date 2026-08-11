@@ -98,7 +98,7 @@ async function compareAuthenticationMethods() {
 	console.log("// Step 1: Generate authorization URL");
 	console.log("const pkceParams = userClient.generatePKCEParams();");
 	console.log("const authUrl = userClient.getAuthorizationUrl(pkceParams, [");
-	console.log("  'public', 'chat:write'");
+	console.log("  'user:read', 'chat:write'");
 	console.log("]);");
 	console.log("");
 	console.log("// Step 2: Redirect user to authUrl");
@@ -226,7 +226,7 @@ async function demonstrateClientTypes() {
 
 		console.log("\nGenerating OAuth URL for user client...");
 		const pkceParams = userClient.generatePKCEParams();
-		const authUrl = userClient.getAuthorizationUrl(pkceParams, ["public"]);
+		const authUrl = userClient.getAuthorizationUrl(pkceParams, ["user:read"]);
 		console.log("✅ OAuth URL generated successfully");
 		console.log(`   URL: ${authUrl.substring(0, 60)}...`);
 	} catch (error) {

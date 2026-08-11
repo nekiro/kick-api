@@ -62,4 +62,9 @@ export class ChatModule {
 			body: JSON.stringify(params),
 		});
 	}
+
+	async deleteMessage(messageId: string): Promise<void> {
+		if (!messageId) throw new KickBadRequestError("messageId is required");
+		await this.client.request<void>(`${this.baseRoute}/${encodeURIComponent(messageId)}`, { method: "DELETE" });
+	}
 }

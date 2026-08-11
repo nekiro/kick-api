@@ -1,4 +1,10 @@
-import type { Livestream } from "../types";
+import type {
+	Livestream,
+	LivestreamStats,
+	LivestreamsV2Params,
+	LivestreamV2,
+	PaginatedResponse,
+} from "../types";
 import { KickClient } from "../client";
 import { KickBadRequestError } from "../errors";
 
@@ -65,6 +71,7 @@ export class LivestreamsModule {
 	 * @throws {KickUnauthorizedError} When not properly authenticated
 	 *
 	 * @see https://docs.kick.com/apis/livestreams#get-livestreams
+	 * @deprecated Kick deprecated Livestreams v1. Use getLivestreamsV2 or getLivestreamsByUserIds.
 	 */
 	async getLivestreams(params?: {
 		broadcaster_user_id?: number[];
@@ -110,5 +117,41 @@ export class LivestreamsModule {
 		return this.client.request<Livestream[]>(
 			`${this.baseRoute}${searchParams.size ? `?${searchParams.toString()}` : ""}`,
 		);
+	}
+
+	/** Get active livestreams using the current cursor-paginated v2 endpoint. */
+	async getLivestreamsV2(params: LivestreamsV2Params = {}): Promise<PaginatedResponse<LivestreamV2>> {
+		if (params.limit !== undefined && (params.limit < 1 || params.limit > 1000)) {
+			throw new KickBadRequestError("limit must be between 1 and 1000");
+		}
+		if (params.category_id && params.category_id.length > 25) {
+			throw new KickBadRequestError("category_id cannot contain more than 25 IDs");
+		}
+		if (params.language_code && params.language_code.length > 25) {
+			throw new KickBadRequestError("language_code cannot contain more than 25 values");
+		}
+
+		const searchParams = new URLSearchParams();
+		params.category_id?.forEach((id) => searchParams.append("category_id", id.toString()));
+		params.language_code?.forEach((code) => searchParams.append("language_code", code));
+		if (params.limit !== undefined) searchParams.set("limit", params.limit.toString());
+		if (params.cursor) searchParams.set("cursor", params.cursor);
+
+		const query = searchParams.size ? `?${searchParams.toString()}` : "";
+		return this.client.requestEnvelope<PaginatedResponse<LivestreamV2>>(`/public/v2/livestreams${query}`);
+	}
+
+	/** Get active livestreams for up to 100 broadcaster user IDs. */
+	async getLivestreamsByUserIds(userIds: number[]): Promise<LivestreamV2[]> {
+		if (!userIds.length || userIds.length > 100) {
+			throw new KickBadRequestError("userIds must contain between 1 and 100 IDs");
+		}
+		const searchParams = new URLSearchParams();
+		userIds.forEach((id) => searchParams.append("user_id", id.toString()));
+		return this.client.request<LivestreamV2[]>(`/public/v1/users/livestreams?${searchParams.toString()}`);
+	}
+
+	async getLivestreamStats(): Promise<LivestreamStats> {
+		return this.client.request<LivestreamStats>(`${this.baseRoute}/stats`);
 	}
 }

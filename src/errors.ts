@@ -1,13 +1,13 @@
 export class KickApiError extends Error {
 	public readonly status: number;
-	public readonly responseBody?: any;
+	public readonly responseBody?: unknown;
 	public readonly headers?: Record<string, string>;
 	public readonly endpoint?: string;
 
 	constructor(
 		message: string,
 		status: number,
-		responseBody?: any,
+		responseBody?: unknown,
 		headers?: Record<string, string>,
 		endpoint?: string,
 	) {
@@ -34,7 +34,7 @@ export class KickApiError extends Error {
 }
 
 export class KickOAuthError extends KickApiError {
-	constructor(message: string, status: number, responseBody?: any) {
+	constructor(message: string, status: number, responseBody?: unknown) {
 		super(`OAuth Error: ${message}`, status, responseBody);
 		this.name = "KickOAuthError";
 		Object.setPrototypeOf(this, KickOAuthError.prototype);
@@ -42,7 +42,7 @@ export class KickOAuthError extends KickApiError {
 }
 
 export class KickBadRequestError extends KickApiError {
-	constructor(message: string, responseBody?: any, endpoint?: string) {
+	constructor(message: string, responseBody?: unknown, endpoint?: string) {
 		super(`Bad Request: ${message}`, 400, responseBody, undefined, endpoint);
 		this.name = "KickBadRequestError";
 		Object.setPrototypeOf(this, KickBadRequestError.prototype);
@@ -52,7 +52,7 @@ export class KickBadRequestError extends KickApiError {
 export class KickUnauthorizedError extends KickApiError {
 	constructor(
 		message: string = "Unauthorized - Invalid or expired credentials",
-		responseBody?: any,
+		responseBody?: unknown,
 		endpoint?: string,
 	) {
 		super(`Unauthorized: ${message}`, 401, responseBody, undefined, endpoint);
@@ -62,7 +62,7 @@ export class KickUnauthorizedError extends KickApiError {
 }
 
 export class KickForbiddenError extends KickApiError {
-	constructor(message: string = "Forbidden - Access denied", responseBody?: any, endpoint?: string) {
+	constructor(message: string = "Forbidden - Access denied", responseBody?: unknown, endpoint?: string) {
 		super(`Forbidden: ${message}`, 403, responseBody, undefined, endpoint);
 		this.name = "KickForbiddenError";
 		Object.setPrototypeOf(this, KickForbiddenError.prototype);
@@ -70,7 +70,7 @@ export class KickForbiddenError extends KickApiError {
 }
 
 export class KickNotFoundError extends KickApiError {
-	constructor(message: string = "Resource not found", responseBody?: any, endpoint?: string) {
+	constructor(message: string = "Resource not found", responseBody?: unknown, endpoint?: string) {
 		super(`Not Found: ${message}`, 404, responseBody, undefined, endpoint);
 		this.name = "KickNotFoundError";
 		Object.setPrototypeOf(this, KickNotFoundError.prototype);
@@ -80,7 +80,7 @@ export class KickNotFoundError extends KickApiError {
 export class KickRateLimitError extends KickApiError {
 	public readonly retryAfter?: number;
 
-	constructor(message: string = "Rate limit exceeded", responseBody?: any, retryAfter?: number, endpoint?: string) {
+	constructor(message: string = "Rate limit exceeded", responseBody?: unknown, retryAfter?: number, endpoint?: string) {
 		super(`Rate Limited: ${message}`, 429, responseBody, undefined, endpoint);
 		this.name = "KickRateLimitError";
 		this.retryAfter = retryAfter;
@@ -89,7 +89,7 @@ export class KickRateLimitError extends KickApiError {
 }
 
 export class KickServerError extends KickApiError {
-	constructor(message: string = "Internal server error", status: number = 500, responseBody?: any, endpoint?: string) {
+	constructor(message: string = "Internal server error", status: number = 500, responseBody?: unknown, endpoint?: string) {
 		super(`Server Error: ${message}`, status, responseBody, undefined, endpoint);
 		this.name = "KickServerError";
 		Object.setPrototypeOf(this, KickServerError.prototype);
@@ -110,7 +110,7 @@ export class KickNetworkError extends Error {
 export function createKickError(
 	status: number,
 	statusText: string,
-	responseBody?: any,
+	responseBody?: unknown,
 	headers?: Record<string, string>,
 	endpoint?: string,
 ): KickApiError {

@@ -1,6 +1,6 @@
 import type { Channel } from "../types";
 import { KickClient } from "../client";
-import { KickBadRequestError } from "../errors";
+import { KickBadRequestError, KickNotFoundError } from "../errors";
 
 export class ChannelsModule {
 	private readonly baseRoute = "/public/v1/channels";
@@ -122,6 +122,15 @@ export class ChannelsModule {
 	 * @see https://docs.kick.com/apis/channels#patch-channels
 	 */
 	async updateChannel(params: { category_id?: number; custom_tags?: string[]; stream_title?: string }): Promise<void> {
+		if (!params || Object.keys(params).length === 0) {
+			throw new KickBadRequestError("At least one channel property is required");
+		}
+		if (params.custom_tags && params.custom_tags.length > 10) {
+			throw new KickBadRequestError("custom_tags cannot contain more than 10 items");
+		}
+		if (params.stream_title !== undefined && params.stream_title.length === 0) {
+			throw new KickBadRequestError("stream_title cannot be empty");
+		}
 		await this.client.request<void>(this.baseRoute, {
 			method: "PATCH",
 			body: JSON.stringify(params),
@@ -156,7 +165,7 @@ export class ChannelsModule {
 		const channels = await this.getChannels({ slug: [slug] });
 
 		if (channels.length === 0) {
-			throw new KickBadRequestError(`Channel '${slug}' not found`);
+			throw new KickNotFoundError(`Channel '${slug}' not found`);
 		}
 
 		return channels[0];

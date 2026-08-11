@@ -135,7 +135,7 @@ const userClient = new client({
 
 // Generate OAuth URL
 const pkceParams = userClient.generatePKCEParams();
-const authUrl = userClient.getAuthorizationUrl(pkceParams, ["public", "chat:write"]);
+const authUrl = userClient.getAuthorizationUrl(pkceParams, ["user:read", "chat:write"]);
 
 // After user authorizes and you get the code:
 const token = await userClient.exchangeCodeForToken({
@@ -229,7 +229,7 @@ To use this client, you'll need to:
 1. Create a Kick developer account
 2. Create an application in the Kick developer portal
 3. Note your Client ID and Client Secret
-4. Configure the appropriate scopes (e.g., `chat:read`, `chat:write`)
+4. Configure the appropriate scopes (e.g., `channel:read`, `chat:write`)
 
 ## Need Help?
 

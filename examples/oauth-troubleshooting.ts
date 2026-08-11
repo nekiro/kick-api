@@ -116,7 +116,7 @@ async function troubleshootOAuth() {
 		});
 
 		const pkceParams = userClient.generatePKCEParams();
-		const authUrl = userClient.getAuthorizationUrl(pkceParams, ["public", "chat:read"]);
+		const authUrl = userClient.getAuthorizationUrl(pkceParams, ["user:read", "channel:read"]);
 
 		console.log("✅ OAuth URL generated successfully!");
 		console.log("🔗 Test URL: " + authUrl.substring(0, 60) + "...\n");

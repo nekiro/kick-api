@@ -32,23 +32,13 @@ async function main() {
 		console.log("\n📂 Testing Categories API...");
 
 		// Search for gaming categories
-		const categories = await kickClient.categories.getCategories({
-			q: "gaming",
-			page: 1,
-		});
+		const categoriesPage = await kickClient.categories.getCategoriesV2({ name: ["gaming"] });
+		const categories = categoriesPage.data;
 
 		console.log(`Found ${categories.length} categories:`);
 		categories.forEach((category, index) => {
 			console.log(`  ${index + 1}. ${category.name} (ID: ${category.id})`);
 		});
-
-		// Get specific category
-		if (categories.length > 0) {
-			const firstCategory = await kickClient.categories.getCategory(categories[0].id);
-			console.log(`\nDetailed info for "${firstCategory.name}":`);
-			console.log(`  - ID: ${firstCategory.id}`);
-			console.log(`  - Thumbnail: ${firstCategory.thumbnail}`);
-		}
 
 		console.log("\n📺 Testing Channels API...");
 
@@ -59,21 +49,21 @@ async function main() {
 
 		console.log(`Found ${channels.length} channels:`);
 		channels.slice(0, 3).forEach((channel, index) => {
-			console.log(`  ${index + 1}. ${channel.user.username} (${channel.followers_count} followers)`);
+			console.log(`  ${index + 1}. ${channel.slug}: ${channel.stream_title}`);
 		});
 
 		console.log("\n🎥 Testing Livestreams API...");
 
 		// Get live streams
-		const livestreams = await kickClient.livestreams.getLivestreams({
-			category_id: 1, // Gaming category
-			sort: "viewer_count",
+		const livestreamsPage = await kickClient.livestreams.getLivestreamsV2({
+			category_id: [1], // Gaming category
 			limit: 20,
 		});
+		const livestreams = livestreamsPage.data;
 
 		console.log(`Found ${livestreams.length} live streams:`);
 		livestreams.slice(0, 3).forEach((stream, index) => {
-			console.log(`  ${index + 1}. "${stream.stream_title}" - ${stream.viewer_count} viewers`);
+			console.log(`  ${index + 1}. "${stream.title}" - ${stream.viewer_count} viewers`);
 		});
 
 		console.log("\n💬 Testing Chat API...");
